@@ -1,10 +1,11 @@
 #include <Mouse.h>
 
-#define DEBOUNCE 40
+#define DEBOUNCE 140
 #define BUTTON_PIN A3
 
 boolean pressed = false;
 long lastPressed = 0;
+boolean stateToggled = false;
 
 void setup() 
 {
@@ -14,21 +15,23 @@ void setup()
 
 void loop() 
 {
-  boolean currentState = digitalRead(BUTTON_PIN);
+  boolean currentState = digitalRead(BUTTON_PIN); //Low means the button is pressed
   
   long timeSincePressed = millis() - lastPressed;
   
   if (!currentState && timeSincePressed > DEBOUNCE) //Switch ties the pin to ground, thus active low
   { 
       lastPressed = millis();
-      pressed = !pressed;   
+      pressed = !pressed; //Toggle state
+      stateToggled = true;  //Flag that the state has changed
   }
   
-  if(pressed)
+  if(pressed && stateToggled)
   {
     Mouse.press();
+    stateToggled = false;
   }
-  else
+  if (pressed == false)
   {
     Mouse.release();
   }
